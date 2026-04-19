@@ -122,6 +122,10 @@ button {
   transition: transform 120ms ease, opacity 120ms ease;
 }
 
+button.secondary {
+  background: #3d4d44;
+}
+
 button:hover {
   opacity: 0.92;
 }
@@ -149,6 +153,17 @@ button.danger {
   gap: 1rem;
 }
 
+.list-actions {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+}
+
+#mark-all-scooped {
+  width: auto;
+  padding-inline: 0.9rem;
+}
+
 #status,
 .save-state,
 .error {
@@ -169,7 +184,7 @@ button.danger {
 .tray-card {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 0.8rem;
+  padding: 0.5rem;
   background: #fff;
   animation: card-in 250ms ease-out;
 }
@@ -184,6 +199,46 @@ button.danger {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+}
+
+.tray-summary {
+  display: grid;
+  justify-items: start;
+  text-align: left;
+  width: 100%;
+  background: #f7faf7;
+  color: var(--text);
+  border: 1px solid #dce6de;
+}
+
+.tray-summary:hover {
+  opacity: 1;
+}
+
+.summary-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.summary-date {
+  margin-top: 0.15rem;
+  font-size: 0.88rem;
+  color: #4a5b51;
+}
+
+.tray-details {
+  display: none;
+  gap: 0.65rem;
+  padding: 0.6rem;
+}
+
+.tray-card.is-expanded .tray-details {
+  display: grid;
+}
+
+.tray-card.is-expanded .tray-summary {
+  border-color: #bfd6c6;
+  background: #edf6ef;
 }
 
 .warning {
@@ -219,6 +274,20 @@ button.danger {
 @media (max-width: 720px) {
   .date-grid {
     grid-template-columns: 1fr;
+  }
+
+  .list-actions {
+    justify-items: stretch;
+    width: 100%;
+  }
+
+  .list-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #mark-all-scooped {
+    width: 100%;
   }
 
   .layout {

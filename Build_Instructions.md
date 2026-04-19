@@ -26,3 +26,8 @@ An app to track cat litter types and usage, as well as litter tray change dates
 - App should be responsive and work well on laptops or mobile phones
 - App should highlight any litter tray wit a warning if the last scooped date is over a week ago
 - When a tray's last changed date is updated, last scooped date should be updated to match
+- Don't show tray number - simply show tray description as the tray titel
+- Trays in the list should initially be shown in a collapsed state that has only the description and last scooped date
+    - Once a tray is clicked or tapped on, expand to show the full detail
+    - Only one tray at a time should be expanded
+- Provide an optional facility to update the last scooped date for all trays at once

@@ -54,7 +54,10 @@
       <section class="panel list-panel">
         <div class="list-head">
           <h2>Tracked Trays</h2>
-          <p id="status" aria-live="polite"></p>
+          <div class="list-actions">
+            <button id="mark-all-scooped" class="secondary" type="button">Mark All Scooped Today</button>
+            <p id="status" aria-live="polite"></p>
+          </div>
         </div>
         <div id="tray-list" class="tray-list"></div>
       </section>
@@ -62,40 +65,47 @@
 
     <template id="tray-card-template">
       <article class="tray-card">
-        <div class="card-top">
-          <strong class="tray-id"></strong>
-          <button class="danger" type="button">Remove</button>
-        </div>
-        <p class="warning" aria-live="polite"></p>
+        <button class="tray-summary" type="button" aria-expanded="false">
+          <span class="summary-title"></span>
+          <span class="summary-date"></span>
+        </button>
 
-        <label>
-          Description
-          <input data-field="description" type="text" maxlength="120" required />
-        </label>
+        <div class="tray-details">
+          <div class="card-top">
+            <strong>Tray Details</strong>
+            <button class="danger" type="button">Remove</button>
+          </div>
+          <p class="warning" aria-live="polite"></p>
 
-        <label>
-          Litter Type Description
-          <input data-field="litter_type_description" type="text" maxlength="120" required />
-        </label>
-
-        <div class="date-grid">
           <label>
-            Last Scooped Date
-            <input data-field="last_scooped_date" type="date" required />
+            Description
+            <input data-field="description" type="text" maxlength="120" required />
           </label>
 
           <label>
-            Last Changed Date
-            <input data-field="last_changed_date" type="date" required />
+            Litter Type Description
+            <input data-field="litter_type_description" type="text" maxlength="120" required />
           </label>
+
+          <div class="date-grid">
+            <label>
+              Last Scooped Date
+              <input data-field="last_scooped_date" type="date" required />
+            </label>
+
+            <label>
+              Last Changed Date
+              <input data-field="last_changed_date" type="date" required />
+            </label>
+          </div>
+
+          <label>
+            Notes
+            <textarea data-field="notes" rows="3" maxlength="500"></textarea>
+          </label>
+
+          <p class="save-state"></p>
         </div>
-
-        <label>
-          Notes
-          <textarea data-field="notes" rows="3" maxlength="500"></textarea>
-        </label>
-
-        <p class="save-state"></p>
       </article>
     </template>
 

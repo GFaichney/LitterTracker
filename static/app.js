@@ -3,6 +3,8 @@ const statusEl = document.getElementById("status");
 const formEl = document.getElementById("add-tray-form");
 const formErrorEl = document.getElementById("form-error");
 const trayTemplate = document.getElementById("tray-card-template");
+const markAllScoopedButton = document.getElementById("mark-all-scooped");
+const emptyStateMarkup = '<p class="empty-state">No litter trays yet. Add one above.</p>';
 
 function todayDateString() {
   return new Date().toISOString().slice(0, 10);
@@ -49,6 +51,31 @@ function updateWarningState(cardEl) {
   }
 }
 
+function updateSummaryState(cardEl) {
+  const descriptionInput = cardEl.querySelector('[data-field="description"]');
+  const scoopedDateInput = cardEl.querySelector('[data-field="last_scooped_date"]');
+  const titleEl = cardEl.querySelector(".summary-title");
+  const dateEl = cardEl.querySelector(".summary-date");
+
+  const description = descriptionInput.value.trim();
+  titleEl.textContent = description || "Unnamed tray";
+  dateEl.textContent = `Last scooped: ${scoopedDateInput.value || "not set"}`;
+}
+
+function setCardExpanded(cardEl, expanded) {
+  cardEl.classList.toggle("is-expanded", expanded);
+  const summaryButton = cardEl.querySelector(".tray-summary");
+  summaryButton.setAttribute("aria-expanded", expanded ? "true" : "false");
+}
+
+function collapseOtherCards(activeCard) {
+  trayListEl.querySelectorAll(".tray-card.is-expanded").forEach((card) => {
+    if (card !== activeCard) {
+      setCardExpanded(card, false);
+    }
+  });
+}
+
 async function api(path, options = {}) {
   const response = await fetch(path, {
     headers: { "Content-Type": "application/json" },
@@ -89,9 +116,10 @@ function trayPayloadFromCard(cardEl) {
 function createTrayCard(tray) {
   const node = trayTemplate.content.firstElementChild.cloneNode(true);
   node.dataset.id = String(tray.id);
-  node.querySelector(".tray-id").textContent = `Tray #${tray.id}`;
+  setCardExpanded(node, false);
 
   const saveStateEl = node.querySelector(".save-state");
+  const summaryButton = node.querySelector(".tray-summary");
 
   const setField = (field, value) => {
     node.querySelector(`[data-field="${field}"]`).value = value ?? "";
@@ -103,6 +131,17 @@ function createTrayCard(tray) {
   setField("last_changed_date", tray.last_changed_date);
   setField("notes", tray.notes);
   updateWarningState(node);
+  updateSummaryState(node);
+
+  summaryButton.addEventListener("click", () => {
+    const isExpanded = node.classList.contains("is-expanded");
+    if (isExpanded) {
+      setCardExpanded(node, false);
+      return;
+    }
+    collapseOtherCards(node);
+    setCardExpanded(node, true);
+  });
 
   const saveCard = debounce(async () => {
     saveStateEl.textContent = "Saving...";
@@ -118,6 +157,7 @@ function createTrayCard(tray) {
       setField("last_changed_date", updated.last_changed_date);
       setField("notes", updated.notes);
       updateWarningState(node);
+      updateSummaryState(node);
       saveStateEl.textContent = "Saved";
       setTimeout(() => {
         if (saveStateEl.textContent === "Saved") {
@@ -135,14 +175,20 @@ function createTrayCard(tray) {
   changedDateInput.addEventListener("change", () => {
     scoopedDateInput.value = changedDateInput.value;
     updateWarningState(node);
+    updateSummaryState(node);
     saveCard();
   });
 
   scoopedDateInput.addEventListener("change", () => {
     updateWarningState(node);
+    updateSummaryState(node);
   });
 
   node.querySelectorAll("input, textarea").forEach((input) => {
+    input.addEventListener("focus", () => {
+      collapseOtherCards(node);
+      setCardExpanded(node, true);
+    });
     input.addEventListener("input", saveCard);
     input.addEventListener("change", saveCard);
   });
@@ -155,7 +201,7 @@ function createTrayCard(tray) {
       node.remove();
       setStatus("Tray removed.");
       if (!trayListEl.children.length) {
-        trayListEl.innerHTML = "<p>No litter trays yet. Add one above.</p>";
+        trayListEl.innerHTML = emptyStateMarkup;
       }
     } catch (error) {
       setStatus(error.message);
@@ -171,7 +217,7 @@ async function loadTrays() {
     const trays = await api("/api/trays");
     trayListEl.innerHTML = "";
     if (!trays.length) {
-      trayListEl.innerHTML = "<p>No litter trays yet. Add one above.</p>";
+      trayListEl.innerHTML = emptyStateMarkup;
       setStatus("Ready");
       return;
     }
@@ -211,7 +257,7 @@ formEl.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload),
     });
 
-    const emptyHint = trayListEl.querySelector("p");
+    const emptyHint = trayListEl.querySelector(".empty-state");
     if (emptyHint) {
       trayListEl.innerHTML = "";
     }
@@ -229,6 +275,25 @@ formEl.addEventListener("submit", async (event) => {
 
 formEl.last_changed_date.addEventListener("change", () => {
   formEl.last_scooped_date.value = formEl.last_changed_date.value;
+});
+
+markAllScoopedButton.addEventListener("click", async () => {
+  markAllScoopedButton.disabled = true;
+  const scoopedDate = todayDateString();
+  setStatus("Updating all trays...");
+
+  try {
+    const result = await api("/api/trays/mark-all-scooped", {
+      method: "POST",
+      body: JSON.stringify({ last_scooped_date: scoopedDate }),
+    });
+    await loadTrays();
+    setStatus(`Updated ${result.updated_count} tray(s) to ${result.last_scooped_date}.`);
+  } catch (error) {
+    setStatus(error.message);
+  } finally {
+    markAllScoopedButton.disabled = false;
+  }
 });
 
 formEl.last_scooped_date.value = todayDateString();

@@ -171,6 +171,22 @@ def delete_tray(tray_id: int):
     return "", 204
 
 
+@app.route("/api/trays/mark-all-scooped", methods=["POST"])
+def mark_all_scooped():
+    payload = request.get_json(silent=True) or {}
+    scooped_date = str(payload.get("last_scooped_date", date.today().isoformat())).strip()
+    if not scooped_date:
+        scooped_date = date.today().isoformat()
+
+    with closing(get_connection()) as conn:
+        cursor = conn.execute(
+            "UPDATE litter_trays SET last_scooped_date = ?", (scooped_date,)
+        )
+        conn.commit()
+
+    return jsonify({"updated_count": cursor.rowcount, "last_scooped_date": scooped_date})
+
+
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=8000, debug=False)
