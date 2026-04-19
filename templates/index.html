@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Litter Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <main class="layout">
+      <header class="hero">
+        <h1>Litter Tracker</h1>
+        <p>Track each tray, scoop events, and full litter changes in one place.</p>
+      </header>
+
+      <section class="panel form-panel">
+        <h2>Add Litter Tray</h2>
+        <form id="add-tray-form" class="tray-form">
+          <label>
+            Description
+            <input name="description" type="text" maxlength="120" required />
+          </label>
+
+          <label>
+            Litter Type Description
+            <input name="litter_type_description" type="text" maxlength="120" required />
+          </label>
+
+          <div class="date-grid">
+            <label>
+              Last Scooped Date
+              <input name="last_scooped_date" type="date" required />
+            </label>
+
+            <label>
+              Last Changed Date
+              <input name="last_changed_date" type="date" required />
+            </label>
+          </div>
+
+          <label>
+            Notes
+            <textarea name="notes" rows="3" maxlength="500"></textarea>
+          </label>
+
+          <button type="submit">Add Tray</button>
+          <p id="form-error" class="error" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel list-panel">
+        <div class="list-head">
+          <h2>Tracked Trays</h2>
+          <p id="status" aria-live="polite"></p>
+        </div>
+        <div id="tray-list" class="tray-list"></div>
+      </section>
+    </main>
+
+    <template id="tray-card-template">
+      <article class="tray-card">
+        <div class="card-top">
+          <strong class="tray-id"></strong>
+          <button class="danger" type="button">Remove</button>
+        </div>
+        <p class="warning" aria-live="polite"></p>
+
+        <label>
+          Description
+          <input data-field="description" type="text" maxlength="120" required />
+        </label>
+
+        <label>
+          Litter Type Description
+          <input data-field="litter_type_description" type="text" maxlength="120" required />
+        </label>
+
+        <div class="date-grid">
+          <label>
+            Last Scooped Date
+            <input data-field="last_scooped_date" type="date" required />
+          </label>
+
+          <label>
+            Last Changed Date
+            <input data-field="last_changed_date" type="date" required />
+          </label>
+        </div>
+
+        <label>
+          Notes
+          <textarea data-field="notes" rows="3" maxlength="500"></textarea>
+        </label>
+
+        <p class="save-state"></p>
+      </article>
+    </template>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
