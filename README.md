@@ -81,5 +81,3 @@ Litter Tracker is a small Python web app for tracking cat litter trays, scoop da
 
 - Data is stored locally in `litter_tracker.db`.
 - This app uses Flask's development server by default.
-
-
